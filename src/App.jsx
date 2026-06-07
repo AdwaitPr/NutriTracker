@@ -2,11 +2,13 @@ import { useState } from 'react';
 import CameraScanner from './components/CameraScanner';
 import { fetchNutritionalData } from './utils/api';
 import { getNutrientInfo } from './utils/nutrients';
-import { Leaf, Info, Loader2, ArrowLeft } from 'lucide-react';
+import { saveScan } from './utils/history';
+import { Leaf, Info, Loader2, ArrowLeft, History } from 'lucide-react';
+import HistoryView from './components/History';
 import './App.css';
 
 function App() {
-  const [view, setView] = useState('home'); // 'home', 'scanning', 'results'
+  const [view, setView] = useState('home'); // 'home', 'scanning', 'results', 'history'
   const [foodItem, setFoodItem] = useState('');
   const [loadingData, setLoadingData] = useState(false);
   const [nutritionData, setNutritionData] = useState(null);
@@ -22,6 +24,10 @@ function App() {
     
     if (result.success) {
       setNutritionData(result);
+      saveScan({
+        foodName,
+        nutriments: result.nutriments,
+      });
     } else {
       setError(result.error);
     }
@@ -50,14 +56,24 @@ function App() {
             <Leaf className="w-6 h-6" />
             <h1 className="text-xl font-bold tracking-tight">Smart NutriTracker</h1>
           </div>
-          {view !== 'home' && (
-            <button 
-              onClick={resetScanner}
-              className="text-gray-500 hover:text-gray-800 flex items-center gap-1 text-sm font-medium"
-            >
-              <ArrowLeft className="w-4 h-4" /> Back
-            </button>
-          )}
+          <div className="flex items-center gap-4">
+            {view === 'home' && (
+              <button
+                onClick={() => setView('history')}
+                className="text-gray-500 hover:text-green-600 flex items-center gap-1 text-sm font-medium transition-colors"
+              >
+                <History className="w-5 h-5" />
+              </button>
+            )}
+            {view !== 'home' && (
+              <button
+                onClick={resetScanner}
+                className="text-gray-500 hover:text-gray-800 flex items-center gap-1 text-sm font-medium"
+              >
+                <ArrowLeft className="w-4 h-4" /> Back
+              </button>
+            )}
+          </div>
         </div>
       </header>
 
@@ -87,6 +103,10 @@ function App() {
               </ul>
             </div>
           </div>
+        )}
+
+        {view === 'history' && (
+          <HistoryView />
         )}
 
         {view === 'scanning' && (
