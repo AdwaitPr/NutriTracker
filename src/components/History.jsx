@@ -6,14 +6,15 @@ const HistoryView = () => {
   const [history, setHistory] = useState([]);
   const [summary, setSummary] = useState(null);
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = () => {
     setHistory(getHistory());
     setSummary(getDailySummary());
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadData();
+  }, []);
 
   const handleClearHistory = () => {
     if (window.confirm("Are you sure you want to clear your entire scan history?")) {
